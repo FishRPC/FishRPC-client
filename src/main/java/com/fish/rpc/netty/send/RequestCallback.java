@@ -10,7 +10,6 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.util.FishRPCConfig;
-import com.fish.rpc.util.TimeUtil;
 
 /**
  * 维护一个callBack
@@ -30,11 +29,9 @@ public class RequestCallback {
 	
 	public FishRPCResponse getResponse() throws InterruptedException{
 		try{
-			System.out.println(request.getRequestId()+",client-get-response-start:"+TimeUtil.currentDateString());
-			lock.lock();
+ 			lock.lock();
 			finish.await(FishRPCConfig.getIntValue("fish.rpc.client.read.timeout", 10), TimeUnit.SECONDS);
-			System.out.println(request.getRequestId()+",client-get-response-end:"+TimeUtil.currentDateString());
-			return response;
+ 			return response;
 		}finally{
 			lock.unlock();
 		}
@@ -44,8 +41,7 @@ public class RequestCallback {
 		try{
 			lock.lock();
 			finish.signal();
-			System.out.println(response.getRequestId()+",client-notify-signal:"+TimeUtil.currentDateString());
-			this.response = response;
+ 			this.response = response;
 		}finally{
 			lock.unlock();
 		}
