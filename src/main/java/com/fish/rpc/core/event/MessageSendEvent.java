@@ -36,8 +36,9 @@ public class MessageSendEvent extends Event {
 	 */
 	public FishRPCResponse sync() throws InterruptedException{
 		try{
+			int timeout = FishRPCConfig.getIntValue("fish.rpc.client.read.timeout", 3);
  			lock.lock();
-			finish.await(FishRPCConfig.getIntValue("fish.rpc.client.read.timeout", 3), TimeUnit.SECONDS);
+			finish.await(timeout, TimeUnit.SECONDS);
  			return response;
 		}finally{
 			lock.unlock();

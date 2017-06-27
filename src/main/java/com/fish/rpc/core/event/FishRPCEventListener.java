@@ -12,7 +12,7 @@ public class FishRPCEventListener implements IEventListener{
 	@Subscribe
 	@AllowConcurrentEvents
 	public void action(Event event) { 
-		FishRPCLog.info(String.format("[FishRPCEventListener ] action event=%s", event.toString()));
+		FishRPCLog.debug(String.format("[FishRPCEventListener ] action event=%s", event.toString()));
 		if(event==null || event.getEventId()==null){
 			return;
 		}
