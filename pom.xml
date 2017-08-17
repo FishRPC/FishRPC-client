@@ -5,81 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fish.rpc</groupId>
     <artifactId>FishRPC-client</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <dependencies>
-        <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.0.36.Final</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.esotericsoftware/kryo -->
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-            <version>3.0.3</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency> 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>2.4.2</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.caucho/hessian -->
-        <dependency>
-            <groupId>com.caucho</groupId>
-            <artifactId>hessian</artifactId>
-            <version>4.0.38</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
-            <artifactId>protostuff-core</artifactId>
-            <version>1.0.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
-            <artifactId>protostuff-runtime</artifactId>
-            <version>1.0.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/cglib/cglib-nodep -->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.2</version>
-        </dependency>
-        
-        <dependency>
-           <groupId>com.fish.rpc</groupId>
-		    <artifactId>FishRPC-api-test</artifactId>
-		    <version>1.0-SNAPSHOT</version>
-        </dependency>
+    <version>1.1.1-SNAPSHOT</version>
+    <distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://192.168.0.7:8088/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://192.168.0.7:8088/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+    <dependencies> 
          <dependency>
             <groupId>com.fish.rpc</groupId>
 		    <artifactId>FishRPC-common</artifactId>
-		    <version>1.0-SNAPSHOT</version>
+		    <version>1.1.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

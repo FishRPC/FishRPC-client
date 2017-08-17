@@ -43,9 +43,8 @@ public class FishRPCProxy<T>  extends AbstractInvocationHandler{
 	    if(response!=null && response.getCode()!=-1 && response.getResult()!=null){
     	   return response.getResult();
 	    }
-	    
-   	   	FishRPCLog.error("FishRPCProxy::RuntimeException,connection is not validate,may be server was down.");
-   	   	return  returnDefault(method.getReturnType());
+
+	    return  returnDefault(method.getReturnType());
     }
 	
 	private Object returnDefault(Class<?> returnType){

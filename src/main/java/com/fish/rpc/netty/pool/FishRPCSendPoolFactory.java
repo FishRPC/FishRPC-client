@@ -13,27 +13,27 @@ public class FishRPCSendPoolFactory extends BasePooledObjectFactory<FishRPCConne
 	public FishRPCConnection create() throws Exception {
 		String name = "FishRPC-Connection-"+atomic.incrementAndGet();
 		FishRPCConnection connection = new FishRPCConnection(name);
-		System.out.println("create");
+		//System.out.println("create");
 		return  connection; 
 	}
 
 	@Override
 	public PooledObject<FishRPCConnection> wrap(FishRPCConnection connection) {
-		System.out.println("warp");
+		//System.out.println("warp");
 		return new DefaultPooledObject<FishRPCConnection>(connection);
 	}
 	 
 
 	@Override
 	public void destroyObject(PooledObject<FishRPCConnection> pooledobject) throws Exception {
-		System.out.println("destroy");
+		//System.out.println("destroy");
 		pooledobject.getObject().destory();
 	}
 		 
 
 	@Override
 	public boolean validateObject(PooledObject<FishRPCConnection> pooledobject) {
-		System.out.println("validate");
+		//System.out.println("validate");
 		FishRPCConnection connection = pooledobject.getObject();
 		return connection.isValidate();
 	}
