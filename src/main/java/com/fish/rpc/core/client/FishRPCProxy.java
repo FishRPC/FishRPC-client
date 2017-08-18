@@ -7,8 +7,6 @@ import com.fish.rpc.core.event.AnsyEventBusCenter;
 import com.fish.rpc.core.event.MessageSendEvent;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
-import com.fish.rpc.netty.pool.FishRPCConnection;
-import com.fish.rpc.netty.pool.FishRPCSendPool;
 import com.fish.rpc.util.FishRPCLog;
 import com.google.common.reflect.AbstractInvocationHandler;
 
@@ -39,6 +37,8 @@ public class FishRPCProxy<T>  extends AbstractInvocationHandler{
 	    ListenableFuture<Boolean> result =  threadPoolExecutor.submit(task);*/
        
 	    FishRPCResponse response = event.sync();
+	    
+	    FishRPCLog.debug("the request [%s] , the response [%s]", request,response);
 	    
 	    if(response!=null && response.getCode()!=-1 && response.getResult()!=null){
     	   return response.getResult();

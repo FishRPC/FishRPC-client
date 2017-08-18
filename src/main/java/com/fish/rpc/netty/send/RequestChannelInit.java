@@ -13,7 +13,7 @@ public class RequestChannelInit extends  ChannelInitializer<SocketChannel> {
 	protected void initChannel(SocketChannel channel) throws Exception {
 		ChannelPipeline pipeline = channel.pipeline();
         pipeline.addLast(new KryoEncoder());
-        pipeline.addLast(new KryoDecoder(true));/*
+        pipeline.addLast(new KryoDecoder());/*
         pipeline.addLast(new ProtostuffEncoder());
 	    pipeline.addLast(new ProtostuffDecoder(true));*/
 	    pipeline.addLast(new RequestHandler());
