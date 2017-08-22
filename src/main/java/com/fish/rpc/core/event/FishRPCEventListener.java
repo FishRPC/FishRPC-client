@@ -29,13 +29,20 @@ public class FishRPCEventListener implements IEventListener{
 	private void invokeSend(MessageSendEvent event){
 		FishRPCConnection connection = null;
 		try{ 
+			EventMap.getInstance().put(event);
 			connection = FishRPCSendPool.getInstance().borrow();
 			if(connection==null || !connection.isValidate()){
-				FishRPCLog.error(connection+"，FishRPCProxy happened RuntimeException,return default vale.Connection is not validate on FishRPCEventListener event = "+event.toString());
+				FishRPCLog.error(connection+"，the borrow connection was invalid,return default immediately，FishRPCEventListener invokeSend event = "+event.toString());
+				Event sendEvent = EventMap.getInstance().get(event.getEventId());
+				if(sendEvent instanceof MessageSendEvent){
+					MessageSendEvent messageSendEvent = (MessageSendEvent)sendEvent;
+					messageSendEvent.over(null);
+				}
+				//连接失效，清理连接池
+				//FishRPCSendPool.getInstance().clear();
 				return ;
 			} 
 			connection.write((MessageSendEvent)event);
-			EventMap.getInstance().put(event);
 		}finally{ 
 			FishRPCSendPool.getInstance().giveBack(connection);
 		}

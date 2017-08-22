@@ -47,6 +47,9 @@ public class FishRPCClientInit {
 		List<FishRPCConnection> initConns = new ArrayList<FishRPCConnection>();
 		for (int i = 0; i < minConnection; i++) {
 			FishRPCConnection connection = FishRPCSendPool.getInstance().borrow();
+			if( connection == null ){
+				continue;
+			}
 			initConns.add(connection);
 		}
 		for (FishRPCConnection conn : initConns) {

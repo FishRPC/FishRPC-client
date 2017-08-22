@@ -6,6 +6,7 @@ import com.fish.rpc.serialize.kryo.KryoEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
 public class RequestChannelInit extends  ChannelInitializer<SocketChannel> {
 
@@ -16,6 +17,7 @@ public class RequestChannelInit extends  ChannelInitializer<SocketChannel> {
         pipeline.addLast(new KryoDecoder());/*
         pipeline.addLast(new ProtostuffEncoder());
 	    pipeline.addLast(new ProtostuffDecoder(true));*/
+        pipeline.addLast("idleStateHandler", new IdleStateHandler(10, 5, 0));
 	    pipeline.addLast(new RequestHandler());
 	}
 

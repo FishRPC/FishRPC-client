@@ -1,6 +1,5 @@
 package com.fish.rpc.netty.pool;
 
-import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
@@ -48,15 +47,16 @@ public class FishRPCSendPool {
 	 public FishRPCConnection borrow(){
 		 FishRPCConnection connection = null;
 		 try{ 
+			
 			 connection =  fishRPCConnectionPool.borrowObject();
 			 FishRPCLog.debug("borrow an object named %s", connection.getName());
 			 if(connection!=null && !connection.isValidate()){
 				 connection.connect();
-			 }
+			 } 
 			 return connection;
 		 }catch(final Exception e){
-			 //throw new RuntimeException(e);
-			 return connection;
+			 FishRPCLog.error(e,"FishRPCSendPool borrow exception %s",e.getMessage());
+			 return null;
 		 }
 	 }
 	 
@@ -66,9 +66,13 @@ public class FishRPCSendPool {
 		 fishRPCConnectionPool.returnObject(object);
 	 }
 	 
-	 public void reset(){
+	 /*public void clear() {
 		 FishRPCLog.info("FishRPC client reset connect pool.");
-		 instance = null;
-	 }
+		 try {
+			//fishRPCConnectionPool.clear();
+		} catch (Exception e) {
+			FishRPCLog.error("fishRPCConnectionPool reset error.", e);
+		}
+	 }*/
 	 
 }

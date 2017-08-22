@@ -11,6 +11,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 public class FishRPCBootstrap {
     public static final EventLoopGroup eventLoopGroup = new NioEventLoopGroup(FishRPCConfig.PARALLEL);
     
-    public  static final Bootstrap bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true);
+    public  static final Bootstrap bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).option(ChannelOption.TCP_NODELAY, true);
 
 }

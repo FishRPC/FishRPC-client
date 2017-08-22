@@ -19,7 +19,7 @@ public class FishRPCProxy<T>  extends AbstractInvocationHandler{
     		));*/
 
 	@Override
-	public Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+	public Object handleInvocation(Object proxy, Method method, Object[] args) throws Exception {
        
 	    FishRPCRequest request = new FishRPCRequest();
 	    request.setRequestId(UUID.randomUUID().toString());
@@ -40,9 +40,13 @@ public class FishRPCProxy<T>  extends AbstractInvocationHandler{
 	    
 	    FishRPCLog.debug("the request [%s] , the response [%s]", request,response);
 	    
-	    if(response!=null && response.getCode()!=-1 && response.getResult()!=null){
+	    if(response!=null && response.getCode()==0 && response.getResult()!=null){
     	   return response.getResult();
 	    }
+	    
+	    if(response!=null && response.getCode()==-1 && response.getResult() instanceof Exception){
+	    	  throw (Exception)response.getResult();
+		}
 
 	    return  returnDefault(method.getReturnType());
     }
