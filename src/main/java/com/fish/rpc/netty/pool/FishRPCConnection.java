@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.fish.rpc.core.event.MessageSendEvent;
 import com.fish.rpc.dto.FishRPCRequest;
-import com.fish.rpc.netty.send.RequestCallback;
 import com.fish.rpc.netty.send.RequestHandler;
 import com.fish.rpc.netty.watch.ConnectionWatchDog;
 import com.fish.rpc.serialize.kryo.KryoDecoder;
@@ -38,12 +37,7 @@ public class FishRPCConnection {
 	
 	public boolean connect() throws Exception{
 		ChannelFuture channelFuture = null;
-		try {
-			
-			/*ChannelFuture channelFuture = FishRPCBootstrap.bootstrap
-	                .remoteAddress(remoteAddr)
-	        		.handler(new RequestChannelInit())
-	        		.connect().sync(); */
+		try { 
 			final ConnectionWatchDog watchdog = new ConnectionWatchDog(FishRPCBootstrap.bootstrap, 
 					timer, remoteAddr, true) {   
                 public ChannelHandler[] handlers() {  
@@ -69,7 +63,7 @@ public class FishRPCConnection {
     				@Override
     				public void operationComplete(ChannelFuture channelFuture) throws Exception {
     					if (channelFuture.isSuccess()) {
-    						 FishRPCLog.debug("New FishRPC connection %s to %s:%s", name,remoteAddr.getAddress().getHostAddress(),remoteAddr.getPort());
+     						 FishRPCLog.info("[FishRPCConnection][connect][新建RPC连接][%s][%s][%s]", name,remoteAddr.getAddress().getHostAddress(),remoteAddr.getPort());
     						 channel = channelFuture.channel();
     					 } 
     				} 
@@ -81,7 +75,6 @@ public class FishRPCConnection {
 		}finally{ 
 			 
 		}
-         
         return Boolean.TRUE;
 	}
 	
@@ -102,19 +95,16 @@ public class FishRPCConnection {
 		return name;
 	}
 	
-	public void write(final FishRPCRequest request,RequestCallback callback){
-		RequestHandler handler = channel.pipeline().get(RequestHandler.class);
-		handler.sendRequest(request,callback); 
-	}
-	
-	public void write(MessageSendEvent event){
+	public void write(MessageSendEvent event) {
 		final FishRPCRequest request = event.getRequest();
-		FishRPCLog.debug("The request %s ,client-send-start at %s",request.getRequestId(),TimeUtil.currentDateString());
+		FishRPCLog.debug("[FishRPCConnection][write][开始发送数据:%s][请求ID：%s]", TimeUtil.currentDateString(),
+				request.getRequestId());
 		channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
-        public void operationComplete(ChannelFuture channelFuture) throws Exception {
-         	FishRPCLog.debug("The request %s ,client-send-end at %s",request.getRequestId(),TimeUtil.currentDateString());
-        }
-        });
+			public void operationComplete(ChannelFuture channelFuture) throws Exception {
+				FishRPCLog.debug("[FishRPCConnection][write][发送数据结束:%s][请求ID：%s]", TimeUtil.currentDateString(),
+						request.getRequestId());
+			}
+		});
 	}
 	 
 }

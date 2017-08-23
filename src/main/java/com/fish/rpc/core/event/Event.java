@@ -15,7 +15,7 @@ public class Event {
 	
 	@Override
     public String toString() {
-        return "Event [eventName=" + eventName + "][eventId=" + eventId+"]";
+        return "Event[eventName=" + eventName + "][eventId=" + eventId+"]";
     }
 	
 	public String getEventName() {

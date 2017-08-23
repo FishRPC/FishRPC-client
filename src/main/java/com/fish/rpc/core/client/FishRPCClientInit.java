@@ -8,6 +8,7 @@ import com.fish.rpc.core.event.FishRPCEventListener;
 import com.fish.rpc.netty.pool.FishRPCConnection;
 import com.fish.rpc.netty.pool.FishRPCSendPool;
 import com.fish.rpc.util.FishRPCConfig;
+import com.fish.rpc.util.FishRPCLog;
 
 public class FishRPCClientInit {
 	
@@ -41,9 +42,8 @@ public class FishRPCClientInit {
 
 	private static void initRPCConnection() {
 		long start = System.currentTimeMillis();
-		System.out.println("Init fishRPC connection...");
 		int minConnection = FishRPCConfig.getIntValue("fish.rpc.connect.min", 100);
-		System.out.println("Init fishRPC connection,min=" + minConnection);
+		FishRPCLog.info("[FishRPCClientInit][initRPCConnection][RPC连接初始化][最小连接数：%s ms]",minConnection);
 		List<FishRPCConnection> initConns = new ArrayList<FishRPCConnection>();
 		for (int i = 0; i < minConnection; i++) {
 			FishRPCConnection connection = FishRPCSendPool.getInstance().borrow();
@@ -55,7 +55,7 @@ public class FishRPCClientInit {
 		for (FishRPCConnection conn : initConns) {
 			FishRPCSendPool.getInstance().giveBack(conn);
 		}
-		System.out.println("Init fishRPC connection done ," + (System.currentTimeMillis() - start) + " ms");
-	}
+		FishRPCLog.info("[FishRPCClientInit][initRPCConnection][RPC连接初始化完成][耗时：%s]",(System.currentTimeMillis() - start));
+ 	}
 
 }

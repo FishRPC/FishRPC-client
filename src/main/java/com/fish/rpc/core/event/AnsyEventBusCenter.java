@@ -38,7 +38,7 @@ public class AnsyEventBusCenter {
 			Object obj = registerListenerContainers.get(clazzName).newInstance();
 			eventBus.register(obj);
 		}catch(Exception e){
-			FishRPCLog.error(e, e.getMessage()+" register listener erro, clazzName=%s", clazzName);
+			FishRPCLog.error(e, "[AnsyEventBusCenter][register][Exception:%s]", e.getMessage());
 		}
 	}
 	

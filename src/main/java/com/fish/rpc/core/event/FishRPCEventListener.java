@@ -1,5 +1,6 @@
 package com.fish.rpc.core.event;
 
+import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.netty.pool.FishRPCConnection;
 import com.fish.rpc.netty.pool.FishRPCSendPool;
 import com.fish.rpc.util.FishRPCLog;
@@ -12,7 +13,9 @@ public class FishRPCEventListener implements IEventListener{
 	@Subscribe
 	@AllowConcurrentEvents
 	public void action(Event event) { 
-		FishRPCLog.debug(String.format("[FishRPCEventListener ] action event=%s", event.toString()));
+ 		
+		FishRPCLog.info("[FishRPCEventListener][action][接收事件][%s]",event);
+		
 		if(event==null || event.getEventId()==null){
 			return;
 		}
@@ -23,8 +26,8 @@ public class FishRPCEventListener implements IEventListener{
 			invokeReceive((MessageReceiveEvent)event);
 			return ;
 		}
-		FishRPCLog.warn("FishRPCEventListener can not deal event which not support.The event is "+event.toString());
-	}
+		FishRPCLog.warn("[FishRPCEventListener][action][不支持事件][%s]",event);
+ 	}
 	
 	private void invokeSend(MessageSendEvent event){
 		FishRPCConnection connection = null;
@@ -32,14 +35,18 @@ public class FishRPCEventListener implements IEventListener{
 			EventMap.getInstance().put(event);
 			connection = FishRPCSendPool.getInstance().borrow();
 			if(connection==null || !connection.isValidate()){
-				FishRPCLog.error(connection+"，the borrow connection was invalid,return default immediately，FishRPCEventListener invokeSend event = "+event.toString());
+				FishRPCLog.error("[FishRPCEventListener][invokeSend][连接无效：%s][立即返回默认值][事件：%s]",connection, event);
 				Event sendEvent = EventMap.getInstance().get(event.getEventId());
 				if(sendEvent instanceof MessageSendEvent){
 					MessageSendEvent messageSendEvent = (MessageSendEvent)sendEvent;
-					messageSendEvent.over(null);
+					//返回一个默认的响应
+					FishRPCResponse response = new FishRPCResponse();
+					response.setRequestId(event.getRequest().getRequestId());
+					response.setCode(-1);
+					response.setError("RPC连接无效");
+					response.setResult(new Exception("RPC连接无效"));
+					messageSendEvent.over(response);
 				}
-				//连接失效，清理连接池
-				//FishRPCSendPool.getInstance().clear();
 				return ;
 			} 
 			connection.write((MessageSendEvent)event);

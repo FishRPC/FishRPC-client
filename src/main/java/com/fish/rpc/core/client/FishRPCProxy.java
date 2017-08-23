@@ -8,6 +8,7 @@ import com.fish.rpc.core.event.MessageSendEvent;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
 import com.fish.rpc.util.FishRPCLog;
+import com.fish.rpc.util.TimeUtil;
 import com.google.common.reflect.AbstractInvocationHandler;
 
 public class FishRPCProxy<T>  extends AbstractInvocationHandler{
@@ -38,7 +39,10 @@ public class FishRPCProxy<T>  extends AbstractInvocationHandler{
        
 	    FishRPCResponse response = event.sync();
 	    
-	    FishRPCLog.debug("the request [%s] , the response [%s]", request,response);
+	    String requestTimeStr = TimeUtil.formatMillsecond(request.getRequestTime());
+	    String responseTimeStr = TimeUtil.formatMillsecond(response.getResponseTime());
+		FishRPCLog.info("[FishRPCProxy][handleInvocation][RPC请求响应]\n[%s 请求-> %s]\n[%s 响应<- %s]",requestTimeStr,request,responseTimeStr,response);
+
 	    
 	    if(response!=null && response.getCode()==0 && response.getResult()!=null){
     	   return response.getResult();

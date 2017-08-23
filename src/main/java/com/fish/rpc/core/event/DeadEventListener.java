@@ -11,6 +11,8 @@ public class DeadEventListener {
 	@Subscribe
 	@AllowConcurrentEvents
 	public void listen(DeadEvent event){
-		FishRPCLog.warn("Found an unSubscribe event.%s", ReflectionToStringBuilder.toString(event));
+		
+		FishRPCLog.warn("[DeadEventListener][listen][未订阅的事件][%s]", ReflectionToStringBuilder.toString(event));
+		
 	}
 }

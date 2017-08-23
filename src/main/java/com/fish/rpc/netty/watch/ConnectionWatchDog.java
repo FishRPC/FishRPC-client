@@ -53,7 +53,7 @@ public abstract class ConnectionWatchDog extends ChannelInboundHandlerAdapter im
 			if (attempts < 10) {
 				attempts++;
 				int timeout = 2 << attempts; // 重连的间隔时间会越来越长
-				FishRPCLog.debug("链接关闭，%s 秒后将进行第%s次重连",timeout,attempts);
+				FishRPCLog.debug("[ConnectionWatchDog][channelInactive][%s秒后重连][第%s次重连]",timeout,attempts);
 				timer.newTimeout(this, timeout, TimeUnit.SECONDS);
 			}
 		}
@@ -61,9 +61,7 @@ public abstract class ConnectionWatchDog extends ChannelInboundHandlerAdapter im
 	}
 
 	public void run(Timeout timeout) throws Exception {
-
-		ChannelFuture future;
-		// bootstrap已经初始化好了，只需要将handler填入就可以了
+		ChannelFuture future; 
 		synchronized (bootstrap) {
 			bootstrap.handler(new ChannelInitializer<Channel>() {
 				@Override
@@ -72,16 +70,14 @@ public abstract class ConnectionWatchDog extends ChannelInboundHandlerAdapter im
 				}
 			});
 			future = bootstrap.connect(remortAddr);
-		}
-		// future对象
+		} 
 		future.addListener(new ChannelFutureListener() {
 			public void operationComplete(ChannelFuture f) throws Exception {
 				boolean succeed = f.isSuccess();
-				// 如果重连失败，则调用ChannelInactive方法，再次出发重连事件，一直尝试12次，如果失败则不再重连
-				if (!succeed) { 
+ 				if (!succeed) { 
 					f.channel().pipeline().fireChannelInactive();
 				} else {
-					FishRPCLog.debug("第%s次重连成功",attempts);
+					FishRPCLog.debug("[ConnectionWatchDog][run][第%s次重连][成功]",attempts);
 				}
 			}
 		}); 

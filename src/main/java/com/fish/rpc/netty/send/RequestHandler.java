@@ -1,6 +1,5 @@
 package com.fish.rpc.netty.send;
 
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fish.rpc.core.event.AnsyEventBusCenter;
@@ -8,7 +7,6 @@ import com.fish.rpc.core.event.MessageReceiveEvent;
 import com.fish.rpc.dto.FishRPCHeartbeat;
 import com.fish.rpc.dto.FishRPCRequest;
 import com.fish.rpc.dto.FishRPCResponse;
-import com.fish.rpc.netty.pool.FishRPCSendPool;
 import com.fish.rpc.util.FishRPCLog;
 //import com.fish.rpc.util.Log;
 import com.fish.rpc.util.TimeUtil;
@@ -29,8 +27,6 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		FishRPCLog.debug("激活时间是：" + new java.util.Date());
-		FishRPCLog.debug("HeartBeatClientHandler channelActive");
 		super.channelActive(ctx);
 	}
 
@@ -42,26 +38,21 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		FishRPCLog.debug("停止时间是：" + new java.util.Date());
-		FishRPCLog.debug("HeartBeatClientHandler channelInactive");
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		FishRPCResponse response = (FishRPCResponse) msg;
-		FishRPCLog.debug("The request %s ,client-read at %s", response.getRequestId(), TimeUtil.currentDateString());
+ 		
+		FishRPCLog.debug("[RequestHandler][channelRead][读取数据：%s][请求ID：%s]",TimeUtil.currentDateString(),response.getRequestId());
+		
 		MessageReceiveEvent event = new MessageReceiveEvent(response);
 		AnsyEventBusCenter.getInstance().post(event);
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-		// 发生异常，如果是IO异常则处理连接
-		/*if (cause instanceof IOException) {
-			FishRPCSendPool pool = FishRPCSendPool.getInstance();
-			pool.clear();
-		}*/
-		FishRPCLog.error(cause, cause.getMessage(), "");
+		FishRPCLog.error(cause,"[RequestHandler][exceptionCaught][Exception:%s]", cause.getMessage());
 		ctx.close();
 	}
 
@@ -71,7 +62,7 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 		if (IdleStateEvent.class.isAssignableFrom(evt.getClass())) {
 			IdleStateEvent event = (IdleStateEvent) evt;
 			if (event.state() == IdleState.WRITER_IDLE){
-				FishRPCLog.debug("heartbeat... "+aFishRPCHeartbeat);
+				FishRPCLog.debug("[RequestHandler][userEventTriggered][心跳][%s]",aFishRPCHeartbeat);
 			 	ctx.writeAndFlush(aFishRPCHeartbeat);  
 			}else {
 				super.userEventTriggered(ctx, evt);
@@ -81,17 +72,5 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
 	public void close() {
 		channel.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
-	}
-
-	public void sendRequest(final FishRPCRequest request, final RequestCallback callback) {
-		FishRPCLog.debug("The request %s ,client-send-start at %s", request.getRequestId(),
-				TimeUtil.currentDateString());
-		channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
-			public void operationComplete(ChannelFuture channelFuture) throws Exception {
-				mapCallBack.put(request.getRequestId(), callback);
-				FishRPCLog.debug("The request %s ,client-send-end at %s", request.getRequestId(),
-						TimeUtil.currentDateString());
-			}
-		});
-	}
-}
+	} 
+ }

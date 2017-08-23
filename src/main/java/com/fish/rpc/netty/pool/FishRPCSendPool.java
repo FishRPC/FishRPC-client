@@ -47,32 +47,21 @@ public class FishRPCSendPool {
 	 public FishRPCConnection borrow(){
 		 FishRPCConnection connection = null;
 		 try{ 
-			
 			 connection =  fishRPCConnectionPool.borrowObject();
-			 FishRPCLog.debug("borrow an object named %s", connection.getName());
+			 FishRPCLog.debug("[FishRPCSendPool][borrow][%s]", connection.getName());
 			 if(connection!=null && !connection.isValidate()){
 				 connection.connect();
 			 } 
 			 return connection;
 		 }catch(final Exception e){
-			 FishRPCLog.error(e,"FishRPCSendPool borrow exception %s",e.getMessage());
+			 FishRPCLog.error(e,"[FishRPCSendPool][borrow][Exception:%s]",e.getMessage());  
 			 return null;
 		 }
 	 }
 	 
 	 public void giveBack(final FishRPCConnection object){
-		 if(object==null)return;
-		 FishRPCLog.debug("return an object named %s", object.getName());
+		 if(object==null)return; 
+		 FishRPCLog.debug("[FishRPCSendPool][giveBack][%s]", object.getName());
 		 fishRPCConnectionPool.returnObject(object);
-	 }
-	 
-	 /*public void clear() {
-		 FishRPCLog.info("FishRPC client reset connect pool.");
-		 try {
-			//fishRPCConnectionPool.clear();
-		} catch (Exception e) {
-			FishRPCLog.error("fishRPCConnectionPool reset error.", e);
-		}
-	 }*/
-	 
+	 } 
 }
