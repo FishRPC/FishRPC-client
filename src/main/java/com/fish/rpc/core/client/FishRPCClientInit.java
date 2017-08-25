@@ -39,11 +39,20 @@ public class FishRPCClientInit {
 			e.printStackTrace();
 		}
 	}
+	
+	public  void init(String configPath,ClassLoader cl){
+		try {
+			 Thread.currentThread().setContextClassLoader(cl);
+			 init(configPath);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	private static void initRPCConnection() {
 		long start = System.currentTimeMillis();
 		int minConnection = FishRPCConfig.getIntValue("fish.rpc.connect.min", 100);
-		FishRPCLog.info("[FishRPCClientInit][initRPCConnection][RPC连接初始化][最小连接数：%s ms]",minConnection);
+		FishRPCLog.info("[FishRPCClientInit][initRPCConnection][RPC连接初始化][最小连接数：%s 个]",minConnection);
 		List<FishRPCConnection> initConns = new ArrayList<FishRPCConnection>();
 		for (int i = 0; i < minConnection; i++) {
 			FishRPCConnection connection = FishRPCSendPool.getInstance().borrow();

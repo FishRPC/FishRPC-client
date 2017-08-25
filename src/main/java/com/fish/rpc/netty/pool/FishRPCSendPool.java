@@ -29,7 +29,7 @@ public class FishRPCSendPool {
 		 config.setMaxTotal(FishRPCConfig.getIntValue("fish.rpc.connect.max", 10));
 		 config.setMaxIdle(FishRPCConfig.getIntValue("fish.rpc.connect.max", 10));
 	     config.setMinIdle(FishRPCConfig.getIntValue("fish.rpc.connect.min", 1));
-	     config.setMaxWaitMillis(FishRPCConfig.getIntValue("fish.rpc.connect.timeout", 0)*1000);
+	     config.setMaxWaitMillis(FishRPCConfig.getIntValue("fish.rpc.connect.timeout", 5)*1000);
 	     
 	     //对象最小的空闲时间。如果为小于等于0，最Long的最大值，如果大于0，当空闲的时间大于这个值时，执行移除这个对象操作。
 	     //默认值是1000L * 60L * 30L;即30分钟。这个参数是强制性的，只要空闲时间超过这个值，就会移除
@@ -41,6 +41,7 @@ public class FishRPCSendPool {
 	     config.setTestOnReturn(false);
 	     config.setTestWhileIdle(false);
 	     //config.setNumTestsPerEvictionRun(-1);
+	     //config.setTimeBetweenEvictionRunsMillis(FishRPCConfig.getIntValue("fish.rpc.connect.check.interval", 10*1000));
 		 fishRPCConnectionPool =  new GenericObjectPool<FishRPCConnection>(new FishRPCSendPoolFactory(),config);
 	 }
 	 
@@ -48,10 +49,7 @@ public class FishRPCSendPool {
 		 FishRPCConnection connection = null;
 		 try{ 
 			 connection =  fishRPCConnectionPool.borrowObject();
-			 FishRPCLog.debug("[FishRPCSendPool][borrow][%s]", connection.getName());
-			 if(connection!=null && !connection.isValidate()){
-				 connection.connect();
-			 } 
+			 //FishRPCLog.debug("[FishRPCSendPool][borrowed][%s]", connection.getName());
 			 return connection;
 		 }catch(final Exception e){
 			 FishRPCLog.error(e,"[FishRPCSendPool][borrow][Exception:%s]",e.getMessage());  
@@ -61,7 +59,6 @@ public class FishRPCSendPool {
 	 
 	 public void giveBack(final FishRPCConnection object){
 		 if(object==null)return; 
-		 FishRPCLog.debug("[FishRPCSendPool][giveBack][%s]", object.getName());
 		 fishRPCConnectionPool.returnObject(object);
 	 } 
 }

@@ -20,7 +20,7 @@
          <dependency>
             <groupId>com.fish.rpc</groupId>
 		    <artifactId>FishRPC-common</artifactId>
-		    <version>1.1.1-SNAPSHOT</version>
+		    <version>1.1.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
