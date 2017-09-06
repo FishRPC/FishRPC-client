@@ -16,7 +16,6 @@ public class FishRPCSendPoolFactory implements PooledObjectFactory<FishRPCConnec
 	public PooledObject<FishRPCConnection> makeObject() throws Exception {
 		String name = "FishRPC-Connection-"+atomic.incrementAndGet();
 		FishRPCConnection connection = new FishRPCConnection(name); 
-		connection.connect();
 		FishRPCLog.debug("[FishRPCSendPoolFactory][makeObject][Connection:%s]", name);
 		return new DefaultPooledObject<FishRPCConnection>(connection);
 	}
@@ -38,15 +37,13 @@ public class FishRPCSendPoolFactory implements PooledObjectFactory<FishRPCConnec
 	@Override
 	public void activateObject(PooledObject<FishRPCConnection> pooledobject) throws Exception {
 		FishRPCLog.debug("[FishRPCSendPoolFactory][activateObject][Connection:%s]", pooledobject.getObject().getName());
- 		/*if(!validateObject(pooledobject)){
-			destroyObject(pooledobject);
-		}*/
+		FishRPCConnection connection = pooledobject.getObject();
+		connection.connect();
 	}
 
 	@Override
 	public void passivateObject(PooledObject<FishRPCConnection> pooledobject) throws Exception {
 		FishRPCLog.debug("[FishRPCSendPoolFactory][passivateObject][Connection:%s]", pooledobject.getObject().getName());
-
 		/*FishRPCConnection connection = pooledobject.getObject();
 		if(connection==null || !connection.isValidate()){
 			connection.connect();

@@ -3,6 +3,8 @@ package com.fish.rpc.netty.watch;
 import java.util.concurrent.TimeUnit;
 
 import com.fish.rpc.netty.pool.FishRPCConnection;
+import com.fish.rpc.netty.pool.FishRPCServerNode;
+import com.fish.rpc.netty.pool.FishRPCServerNodeManager;
 import com.fish.rpc.util.FishRPCLog;
 
 import io.netty.channel.ChannelHandler.Sharable;
@@ -39,7 +41,9 @@ public abstract class ConnectionWatchDog extends ChannelInboundHandlerAdapter im
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if (reconnect) {
+		FishRPCServerNodeManager.getInstance().unUsable(connection.getNode());
+		connection.connect(true);
+		 if (reconnect) {
 			FishRPCLog.debug("[ConnectionWatchDog][channelInactive][连接：%s][%s秒后重连]",connection.getName(),5);
 			timer.newTimeout(this, 5, TimeUnit.SECONDS);
 		}
@@ -50,7 +54,7 @@ public abstract class ConnectionWatchDog extends ChannelInboundHandlerAdapter im
 		if( connection.isValidate() ){
 			return ;
 		}
-		connection.connect(true);
+		connection.connect();
 	}
 
 }

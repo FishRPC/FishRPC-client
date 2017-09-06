@@ -8,12 +8,12 @@ import com.fish.rpc.util.FishRPCLog;
 //import com.fish.rpc.util.Log;
 import com.fish.rpc.util.TimeUtil;
 
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
-public class RequestHandler extends ChannelInboundHandlerAdapter {
+public class RequestHandler extends ChannelDuplexHandler {
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -27,16 +27,19 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		super.channelInactive(ctx); 
 	}
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		FishRPCResponse response = (FishRPCResponse) msg;
- 		
-		FishRPCLog.debug("[RequestHandler][channelRead][读取数据：%s][请求ID：%s]",TimeUtil.currentDateString(),response.getRequestId());
-		
-		MessageReceiveEvent event = new MessageReceiveEvent(response);
-		AnsyEventBusCenter.getInstance().post(event);
+		if( msg instanceof FishRPCResponse ){
+			FishRPCResponse response = (FishRPCResponse) msg;
+			FishRPCLog.debug("[RequestHandler][channelRead][读取数据：%s][请求ID：%s]",TimeUtil.currentDateString(),response.getRequestId());
+			MessageReceiveEvent event = new MessageReceiveEvent(response);
+			AnsyEventBusCenter.getInstance().post(event);
+			return;
+		}
+		super.channelRead(ctx, msg);
 	}
 
 	@Override
@@ -44,7 +47,6 @@ public class RequestHandler extends ChannelInboundHandlerAdapter {
 		FishRPCLog.error(cause,"[RequestHandler][exceptionCaught][Exception:%s]", cause.getMessage());
 		ctx.close();
 	}
-
 	private static final FishRPCHeartbeat aFishRPCHeartbeat = new FishRPCHeartbeat();
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {

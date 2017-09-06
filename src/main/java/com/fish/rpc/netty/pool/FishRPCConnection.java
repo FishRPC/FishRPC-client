@@ -9,7 +9,6 @@ import com.fish.rpc.netty.send.RequestHandler;
 import com.fish.rpc.netty.watch.ConnectionWatchDog;
 import com.fish.rpc.serialize.kryo.KryoDecoder;
 import com.fish.rpc.serialize.kryo.KryoEncoder;
-import com.fish.rpc.util.FishRPCConfig;
 //import com.fish.rpc.util.Log;
 import com.fish.rpc.util.FishRPCLog;
 import com.fish.rpc.util.TimeUtil;
@@ -24,23 +23,31 @@ import io.netty.util.HashedWheelTimer;
 
 public class FishRPCConnection {
 
-	private static String server = FishRPCConfig.getStringValue("fish.rpc.server", "127.0.0.1:5050");
+	/*private static String server = FishRPCConfig.getStringValue("fish.rpc.server", "127.0.0.1:5050");
 	private static InetSocketAddress remoteAddr = new InetSocketAddress(server.split(":")[0], Integer.parseInt(server.split(":")[1]));
+	*/
 	protected final HashedWheelTimer timer = new HashedWheelTimer();
 	private String name;
 	private Channel channel;
+	private FishRPCServerNode node;
 
 	public FishRPCConnection(String _name) {
 		this.name = _name;
 	}
 
-	public boolean connect() throws Exception {
+	public boolean connect()  {
 		return connect(false);
 	}
 
-	public boolean connect(final boolean isReconnect) throws Exception {
+	public boolean connect(final boolean isReconnect)   {
 		ChannelFuture channelFuture = null;
+		this.node = FishRPCServerNodeManager.getInstance().getRandNode();
+		if(node == null){
+			FishRPCLog.error("[FishRPCConnection][connect][无可用服务Node]");
+			return false;
+		}
 		try {
+			final InetSocketAddress remoteAddr = new InetSocketAddress(node.getIp(),node.getPort());
 			final ConnectionWatchDog watchdog = new ConnectionWatchDog(this, timer,true) {
 				public ChannelHandler[] handlers() {
 					return new ChannelHandler[] { 
@@ -58,9 +65,9 @@ public class FishRPCConnection {
 					protected void initChannel(Channel ch) throws Exception {
 						ch.pipeline().addLast(watchdog.handlers());
 					}
-				}).connect(remoteAddr);
-
-				//channelFuture.sync();
+				}).connect(remoteAddr); 
+				
+				channelFuture.isDone();
 				
 				channelFuture.addListener(new ChannelFutureListener() {
 					@Override
@@ -74,6 +81,7 @@ public class FishRPCConnection {
 										remoteAddr.getAddress().getHostAddress(), remoteAddr.getPort());
 							}
 							channel = channelFuture.channel();
+							node.setUsable(true);
 						}else{
 							if (isReconnect) {
 								FishRPCLog.error("[FishRPCConnection][connect][重建RPC连接失败][%s][%s][%s]", name,
@@ -82,6 +90,7 @@ public class FishRPCConnection {
 								FishRPCLog.error("[FishRPCConnection][connect][新建RPC连接失败][%s][%s][%s]", name,
 										remoteAddr.getAddress().getHostAddress(), remoteAddr.getPort());
 							}
+							node.setUsable(false);
 							channelFuture.channel().pipeline().fireChannelInactive();
 						}
 					}
@@ -89,12 +98,13 @@ public class FishRPCConnection {
 			}
 
 		} catch (Exception e) {
-			FishRPCLog.error(e,"[FishRPCConnection][connect][建立RPC连接失败][%s][%s][%s]", name,
-					remoteAddr.getAddress().getHostAddress(), remoteAddr.getPort()); 
+			node.setUsable(false);
+			FishRPCLog.error(e,"[FishRPCConnection][connect][建立RPC连接失败][%s][%s]", name,node); 
+			return false;
 		} finally {
 
-		}
-		return Boolean.TRUE;
+		} 
+		return true;
 	}
 
 	public void destory() {
@@ -125,6 +135,10 @@ public class FishRPCConnection {
 						request.getRequestId());
 			}
 		});
+	}
+	
+	public FishRPCServerNode getNode(){
+		return node;
 	}
 
 }

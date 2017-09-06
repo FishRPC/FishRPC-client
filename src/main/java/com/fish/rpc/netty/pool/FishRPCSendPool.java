@@ -28,7 +28,7 @@ public class FishRPCSendPool {
 	 
 		 config.setMaxTotal(FishRPCConfig.getIntValue("fish.rpc.connect.max", 10));
 		 config.setMaxIdle(FishRPCConfig.getIntValue("fish.rpc.connect.max", 10));
-	     config.setMinIdle(FishRPCConfig.getIntValue("fish.rpc.connect.min", 1));
+	     config.setMinIdle(FishRPCConfig.getIntValue("fish.rpc.connect.min", 3));
 	     config.setMaxWaitMillis(FishRPCConfig.getIntValue("fish.rpc.connect.timeout", 5)*1000);
 	     
 	     //对象最小的空闲时间。如果为小于等于0，最Long的最大值，如果大于0，当空闲的时间大于这个值时，执行移除这个对象操作。
@@ -37,8 +37,8 @@ public class FishRPCSendPool {
 	     //对象最小的空间时间，如果小于等于0，取Long的最大值，如果大于0，当对象的空闲时间超过这个值，并且当前空闲对象的数量大于最小空闲数量(minIdle)时，执行移除操作。
 	     //这个和上面的minEvictableIdleTimeMillis的区别是，它会保留最小的空闲对象数量。而上面的不会，是强制性移除的。默认值是-1；
 	     config.setSoftMinEvictableIdleTimeMillis(1000L * 60L * 30L);
-	     config.setTestOnBorrow(false);
-	     config.setTestOnReturn(false);
+	     config.setTestOnBorrow(true);
+	     config.setTestOnReturn(true);
 	     config.setTestWhileIdle(false);
 	     //config.setNumTestsPerEvictionRun(-1);
 	     //config.setTimeBetweenEvictionRunsMillis(FishRPCConfig.getIntValue("fish.rpc.connect.check.interval", 10*1000));
@@ -49,12 +49,11 @@ public class FishRPCSendPool {
 		 FishRPCConnection connection = null;
 		 try{ 
 			 connection =  fishRPCConnectionPool.borrowObject();
-			 //FishRPCLog.debug("[FishRPCSendPool][borrowed][%s]", connection.getName());
-			 return connection;
+			 FishRPCLog.debug("[FishRPCSendPool][borrowed][%s]", connection);
 		 }catch(final Exception e){
 			 FishRPCLog.error(e,"[FishRPCSendPool][borrow][Exception:%s]",e.getMessage());  
-			 return null;
 		 }
+		 return connection;
 	 }
 	 
 	 public void giveBack(final FishRPCConnection object){

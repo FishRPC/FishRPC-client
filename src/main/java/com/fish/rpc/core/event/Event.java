@@ -6,7 +6,7 @@ public class Event {
 	public static final String FISH_RPC_MSG_RECEIVE_EVT = "FISH_RPC_MSG_RECEIVE_EVT";
 	
 	private String eventId;
-	private String eventName;
+	private String eventName; 
 	
 	public Event(String name,String eventId){
 		this.eventName = name;
