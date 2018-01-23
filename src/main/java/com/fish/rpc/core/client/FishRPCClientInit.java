@@ -36,7 +36,7 @@ public class FishRPCClientInit {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally{
-			exit();
+			//exit();
 		}
 	}
 	
